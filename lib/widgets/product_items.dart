@@ -40,6 +40,19 @@ class ProcductItem extends StatelessWidget {
                 color: Colors.white60,
                 onPressed: () {
                   card.addItem(product.id, product.price, product.title);
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Add item to Cart!'),
+                      duration: const Duration(seconds: 2),
+                      action: SnackBarAction(
+                          label: 'Undo',
+                          textColor: Colors.red,
+                          onPressed: () {
+                            card.removeItem(product.id);
+                          }),
+                    ),
+                  );
                 },
               ),
               backgroundColor: Colors.black54,
