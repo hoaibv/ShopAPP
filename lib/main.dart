@@ -13,7 +13,7 @@ import 'providers/orders.dart';
 import 'screens/order_screen.dart';
 import 'ui.dart';
 
-void main() => runApp(DevicePreview(enabled: !kReleaseMode, builder: (context) => MyApp()));
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -33,9 +33,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        useInheritedMediaQuery: true,
-        locale: DevicePreview.locale(context),
-        builder: DevicePreview.appBuilder,
+        debugShowCheckedModeBanner: false,
         darkTheme: ThemeData.dark(),
         title: 'My Shop',
         theme: ThemeData(

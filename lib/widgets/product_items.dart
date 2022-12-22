@@ -39,7 +39,7 @@ class ProcductItem extends StatelessWidget {
                 icon: const Icon(Icons.shopping_cart),
                 color: Colors.white60,
                 onPressed: () {
-                  card.addItem(product.id, product.price, product.title);
+                  card.addItem(product.id!, product.price, product.title);
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -49,7 +49,7 @@ class ProcductItem extends StatelessWidget {
                           label: 'Undo',
                           textColor: Colors.red,
                           onPressed: () {
-                            card.removeItem(product.id);
+                            card.removeItem(product.id!);
                           }),
                     ),
                   );
