@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/products.dart';
+import '../providers/products_providers.dart';
 
 class EditProductScreen extends StatefulWidget {
   const EditProductScreen({Key? key}) : super(key: key);
@@ -32,6 +34,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
+      if ((_imageUrlController.text.isEmpty) ||
+          (!_imageUrlController.text.startsWith('http') &&
+              !_imageUrlController.text.startsWith('https')) ||
+          (_imageUrlController.text.endsWith('.png') &&
+              _imageUrlController.text.endsWith('jpg') &&
+              _imageUrlController.text.endsWith('jpeg'))) {
+        return;
+      }
       setState(() {});
     }
   }
@@ -42,10 +52,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return null;
     }
     _form.currentState?.save();
-    print('${_editedProduct.title}');
-    print('${_editedProduct.description}');
-    print('${_editedProduct.price}');
-    print('${_editedProduct.imageUrl}');
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -106,6 +114,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       price: double.parse(value!),
                       imageUrl: _editedProduct.imageUrl);
                 },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a price';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  if (double.parse(value) <= 0) {
+                    return 'Please enter a number greater than zero';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Description'),
@@ -119,6 +139,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       description: value!,
                       price: _editedProduct.price,
                       imageUrl: _editedProduct.imageUrl);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter description';
+                  }
+                  if (value!.length > 10) {
+                    return 'Should be a least 10 character long';
+                  }
+                  return null;
                 },
               ),
               Row(
@@ -156,6 +185,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             description: _editedProduct.description,
                             price: _editedProduct.price,
                             imageUrl: value!);
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter an image URL';
+                        }
+                        if (!value.startsWith('http') && !value.startsWith('https')) {
+                          return 'Please return an valid URL';
+                        }
+                        if (!value.endsWith('.png') &&
+                            !value.endsWith('jpg') &&
+                            !value.endsWith('jpeg')) {
+                          return 'Please return an valid image URL';
+                        }
+                        return null;
                       },
                     ),
                   )
