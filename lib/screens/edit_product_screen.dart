@@ -18,7 +18,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _imageUrlController = TextEditingController();
   final _imageUrlFocusNode = FocusNode();
   final _form = GlobalKey<FormState>();
-  var _editedProduct = Product(id: null, title: '', price: 0, description: '', imageUrl: '');
+  var _editedProduct = Product(id: '', title: '', price: 0, description: '', imageUrl: '');
   var _initValues = {
     'title': '',
     'description': '',
@@ -35,32 +35,29 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final productID = ModalRoute.of(context)?.settings.arguments as String;
+      _editedProduct = Provider.of<Products>(context, listen: false).findById(productID);
+      _initValues = {
+        'title': _editedProduct.title,
+        'description': _editedProduct.description,
+        'price': _editedProduct.price.toString(),
+        'imageUrl': ''
+      };
+      _imageUrlController.text = _editedProduct.imageUrl;
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _priceFocusNode.dispose();
     _descriptionFocusNode.dispose();
     _imageUrlController.dispose();
     _imageUrlFocusNode.removeListener(_updateImageUrl);
-  }
-
-  @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      final productID = ModalRoute.of(context)?.settings.arguments as String;
-      print('productID...................$productID');
-      if (productID != null) {
-        _editedProduct = Provider.of<Products>(context, listen: false).findById(productID);
-        _initValues = {
-          'title': _editedProduct.title,
-          'description': _editedProduct.description,
-          'price': _editedProduct.price.toString(),
-          'imageUrl': ''
-        };
-        _imageUrlController.text = _editedProduct.imageUrl;
-      }
-    }
-    _isInit = false;
-    super.didChangeDependencies();
   }
 
   void _updateImageUrl() {
@@ -84,7 +81,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
     _form.currentState?.save();
     if (_editedProduct.id != null) {
-      print('...................${_editedProduct.id}');
       Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id!, _editedProduct);
     } else {
@@ -222,11 +218,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       },
                       onSaved: (value) {
                         _editedProduct = Product(
-                            id: null,
+                            id: _editedProduct.id,
                             title: _editedProduct.title,
                             description: _editedProduct.description,
                             price: _editedProduct.price,
-                            imageUrl: value!);
+                            imageUrl: value!,
+                            isFavorite: _editedProduct.isFavorite);
                       },
                       validator: (value) {
                         if (value!.isEmpty) {
